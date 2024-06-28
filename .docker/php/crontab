@@ -1,0 +1,1 @@
+* * * * * /usr/local/bin/run-cron.sh >> /var/www/storage/logs/cron.log 2>&1
