@@ -59,8 +59,6 @@ docker-compose down
 docker-compose build
 docker-compose up -d
 
-echo "Waiting for the database to start..."
-
 # Checking the state of the database container
 while ! docker-compose exec db mysqladmin --user=${DB_USERNAME} --password=${DB_PASSWORD} --host ${DB_HOST} ping --silent &> /dev/null; do
     echo "Waiting for the database connection..."
@@ -69,10 +67,6 @@ done
 
 # Execution of the installation script inside the container
 echo "Running installation script inside the php container..."
-docker exec php /usr/local/bin/install.sh
-
-# Restarting docker-compose
-docker-compose down
-docker-compose up -d
+docker exec wemx /usr/local/bin/install.sh
 
 echo "Done!"

@@ -20,7 +20,17 @@ alias mv='mv -i'
 
 alias a='php artisan'
 alias supercronic='/usr/local/bin/supercronic /etc/cron.d/laravel-cron'
-alias cron='function _cron() { supercronic "$@"; }; _cron'
-alias crontab='function _crontab() { supercronic "$@"; }; _crontab'
+
+cron() {
+    /usr/local/bin/supercronic "$@"
+}
+
+crontab() {
+    /usr/local/bin/supercronic "$@"
+}
+
+wemx() {
+    /usr/local/bin/wemx.sh "$@"
+}
 
 alias phpd='php -dzend_extension=xdebug.so -dxdebug.mode=debug -dxdebug.idekey=PHPSTORM -dxdebug.start_with_request=yes -dxdebug.client_host=host.docker.internal -dxdebug.client_port=9001'
