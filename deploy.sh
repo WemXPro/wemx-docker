@@ -5,6 +5,7 @@ show_help() {
     echo "Usage: ./deploy.sh [options]"
     echo ""
     echo "Options:"
+    echo "  -c, --console        Start a bash console inside the wemx container"
     echo "  --force-delete       Force delete the .docker/db/data directory and APP_DIR without prompting"
     echo "  --down               Stop all Wemx Docker containers"
     echo "  --up                 Start all Wemx Docker containers"
@@ -17,6 +18,10 @@ ACTION=""
 
 for arg in "$@"; do
     case $arg in
+    -c | --console)
+        docker-compose exec wemx bash
+        exit 0
+        ;;
     --force-delete)
         FORCE_DELETE=true
         shift
