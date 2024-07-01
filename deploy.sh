@@ -6,16 +6,27 @@ show_help() {
     echo ""
     echo "Options:"
     echo "  --force-delete       Force delete the .docker/db/data directory and APP_DIR without prompting"
+    echo "  --down               Stop all Wemx Docker containers"
+    echo "  --up                 Start all Wemx Docker containers"
     echo "  -h, --help           Show this help message and exit"
 }
 
 # Argument parsing
 FORCE_DELETE=false
+ACTION=""
 
 for arg in "$@"; do
     case $arg in
     --force-delete)
         FORCE_DELETE=true
+        shift
+        ;;
+    --down)
+        ACTION="down"
+        shift
+        ;;
+    --up)
+        ACTION="up"
         shift
         ;;
     -h | --help)
@@ -47,26 +58,44 @@ if [ "$FORCE_DELETE" = true ]; then
         rm -rf .docker/db/data
     fi
 
-# Delete the directory named APP_DIR if the --force-delete parameter is passed
+    # Delete the directory named APP_DIR if the --force-delete parameter is passed
     if [ -d "./$APP_DIR" ]; then
         echo "Force deleting ./$APP_DIR..."
         rm -rf ./$APP_DIR
     fi
 fi
 
-# Restart Docker Compose
-docker-compose down
-docker-compose build
-docker-compose up -d
+# Determine the appropriate docker-compose files
+COMPOSE_FILES="-f docker-compose.yml"
 
-# Checking the state of the database container
-while ! docker-compose exec db mysqladmin --user=${DB_USERNAME} --password=${DB_PASSWORD} --host ${DB_HOST} ping --silent &> /dev/null; do
-    echo "Waiting for the database connection..."
-    sleep 5
-done
+if [ "$DB_HOST" = "db" ]; then
+    COMPOSE_FILES="$COMPOSE_FILES -f docker-compose.db.yml"
+fi
 
-# Execution of the installation script inside the container
-echo "Running installation script inside the php container..."
-docker exec wemx /usr/local/bin/install.sh
+if [ "$USE_TRAEFIK" = "true" ]; then
+    COMPOSE_FILES="$COMPOSE_FILES -f docker-compose.traefik.yml"
+else
+    COMPOSE_FILES="$COMPOSE_FILES -f docker-compose.nginx.yml"
+fi
 
-echo "Done!"
+# Perform actions based on the provided argument
+case $ACTION in
+    down)
+        echo "Stopping all Docker containers with configuration: $COMPOSE_FILES"
+        docker-compose $COMPOSE_FILES down
+        ;;
+    up)
+        echo "Starting Docker Compose with configuration: $COMPOSE_FILES"
+        docker-compose $COMPOSE_FILES build
+        docker-compose $COMPOSE_FILES up -d
+
+        # Execution of the installation script inside the container
+        echo "Running installation script inside the wemx container..."
+        docker exec wemx /usr/local/bin/install.sh
+
+        echo "Done!"
+        ;;
+    *)
+        show_help
+        ;;
+esac
