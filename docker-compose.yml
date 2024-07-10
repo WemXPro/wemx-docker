@@ -13,6 +13,7 @@ services:
       - ./.docker/php/install.sh:/usr/local/bin/install.sh
       - ./.docker/php/update.sh:/usr/local/bin/update.sh
       - ./.env:/usr/local/bin/.env
+      - ./backups:/var/backups
     environment:
       APP_URL: ${APP_URL}
       DOMAIN: ${DOMAIN}

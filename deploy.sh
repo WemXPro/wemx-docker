@@ -13,6 +13,15 @@ show_help() {
     echo "  -h, --help           Show this help message and exit"
 }
 
+set_x_perms() {
+    chmod +x "$1"
+}
+
+set_x_perms ".docker/php/install.sh"
+set_x_perms ".docker/php/update.sh"
+set_x_perms ".docker/php/run-cron.sh"
+set_x_perms ".docker/php/wemx.sh"
+
 # Argument parsing
 ACTION=""
 

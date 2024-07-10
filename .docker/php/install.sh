@@ -39,12 +39,12 @@ if [ ! -d "/var/www/vendor" ] || [ ! -f "/var/www/vendor/autoload.php" ]; then
     add_env_variable "LARAVEL_CLOUDFLARE_ENABLED" ${LARAVEL_CLOUDFLARE_ENABLED}
 
     php artisan module:enable
-    php artisan storage:link
+    php artisan storage:link --force
     php artisan migrate --force --no-interaction
     php artisan license:update ${LICENSE_KEY}
     php artisan user:create --email=${EMAIL} --password=${PASSWORD} --username=${USERNAME} --first_name=${FIRST_NAME} --last_name=${LAST_NAME} --no-interaction
     php artisan wemx:chown
-    php artisan storage:link
+    php artisan storage:link --force
     php artisan queue:start --force
 else
     echo "Dependencies are already installed. Skipping composer and artisan commands."
