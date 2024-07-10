@@ -6,14 +6,14 @@ show_help() {
     echo ""
     echo "Options:"
     echo "  -c, --console        Start a bash console inside the wemx container"
-    echo "  --force-delete       Force delete the .docker/db/data directory and APP_DIR without prompting"
     echo "  --down               Stop all Wemx Docker containers"
     echo "  --up                 Start all Wemx Docker containers"
+    echo "  --restart            Restart all Wemx Docker containers"
+    echo "  --rebuild            Rebuild all Wemx Docker containers"
     echo "  -h, --help           Show this help message and exit"
 }
 
 # Argument parsing
-FORCE_DELETE=false
 ACTION=""
 
 for arg in "$@"; do
@@ -22,16 +22,20 @@ for arg in "$@"; do
         docker-compose exec wemx bash
         exit 0
         ;;
-    --force-delete)
-        FORCE_DELETE=true
-        shift
-        ;;
     --down)
         ACTION="down"
         shift
         ;;
     --up)
         ACTION="up"
+        shift
+        ;;
+    --restart)
+        ACTION="restart"
+        shift
+        ;;
+    --rebuild)
+        ACTION="rebuild"
         shift
         ;;
     -h | --help)
@@ -56,20 +60,6 @@ else
     exit 1
 fi
 
-# Delete the .docker/db/data directory if the --force-delete option is passed
-if [ "$FORCE_DELETE" = true ]; then
-    if [ -d ".docker/db/data" ]; then
-        echo "Force deleting .docker/db/data..."
-        rm -rf .docker/db/data
-    fi
-
-    # Delete the directory named APP_DIR if the --force-delete parameter is passed
-    if [ -d "./$APP_DIR" ]; then
-        echo "Force deleting ./$APP_DIR..."
-        rm -rf ./$APP_DIR
-    fi
-fi
-
 # Determine the appropriate docker-compose files
 COMPOSE_FILES="-f docker-compose.yml"
 
@@ -91,6 +81,27 @@ case $ACTION in
         ;;
     up)
         echo "Starting Docker Compose with configuration: $COMPOSE_FILES"
+        docker-compose $COMPOSE_FILES up -d
+
+        # Execution of the installation script inside the container
+        echo "Running installation script inside the wemx container..."
+        docker exec wemx /usr/local/bin/install.sh
+
+        echo "Done!"
+        ;;
+    restart)
+        echo "Restarting all Docker containers with configuration: $COMPOSE_FILES"
+        docker-compose $COMPOSE_FILES restart
+
+        # Execution of the installation script inside the container
+        echo "Running installation script inside the wemx container..."
+        docker exec wemx /usr/local/bin/install.sh
+
+        echo "Done!"
+        ;;
+    rebuild)
+        echo "Rebuilding Docker containers with configuration: $COMPOSE_FILES"
+        docker-compose $COMPOSE_FILES down
         docker-compose $COMPOSE_FILES build
         docker-compose $COMPOSE_FILES up -d
 

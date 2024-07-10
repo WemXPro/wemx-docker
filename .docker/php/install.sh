@@ -49,7 +49,7 @@ if [ ! -d "/var/www/vendor" ] || [ ! -f "/var/www/vendor/autoload.php" ]; then
 else
     echo "Dependencies are already installed. Skipping composer and artisan commands."
     php artisan wemx:chown
-    php artisan storage:link
+    php artisan storage:link --force
     php artisan migrate --force --no-interaction
     php artisan queue:start --force
 fi
