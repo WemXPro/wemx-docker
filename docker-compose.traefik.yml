@@ -24,8 +24,8 @@ services:
       - "traefik.http.routers.nginx-secure.service=nginx"
       - "traefik.http.services.nginx.loadbalancer.server.port=80"
     networks:
-      - proxy
+      - ${NETWORK}
 
 networks:
-  proxy:
+  ${NETWORK}:
     external: true
