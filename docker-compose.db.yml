@@ -17,8 +17,8 @@ services:
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     networks:
-      - ${NETWORK}
+      - proxy
 
 networks:
-  ${NETWORK}:
+  proxy:
     external: true

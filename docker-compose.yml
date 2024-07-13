@@ -34,8 +34,8 @@ services:
       VERSION: ${VERSION}
       TYPE: ${TYPE}
     networks:
-      - ${NETWORK}
+      - proxy
 
 networks:
-  ${NETWORK}:
+  proxy:
     external: true
