@@ -31,7 +31,7 @@ if [ ! -d "/var/www/vendor" ] || [ ! -f "/var/www/vendor/autoload.php" ]; then
     yes | cp -f .env.example .env
     yes | composer install --optimize-autoloader -n
     yes | composer update -n
-    php artisan key:generate --force
+    php artisan key:generate
     php artisan setup:database --host=${DB_HOST} --port=${DB_PORT} --database=${DB_DATABASE} --username=${DB_USERNAME} --password=${DB_PASSWORD} --no-interaction
 
     add_env_variable "APP_URL" ${APP_URL}
